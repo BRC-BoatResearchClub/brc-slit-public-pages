@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#14324d">
+<meta name="description" content="展示スリット条件と過去の1着率増減から抽出した当日の候補一覧">
+<title>BRC展示スリット｜当日の候補一覧</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Yu Gothic",Meiryo,sans-serif;background:#f2f6fa;color:#183047;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(120deg,#12324c,#205e7e);color:white;padding:24px max(18px,env(safe-area-inset-left)) 20px}main{max-width:1050px;margin:auto;padding:16px 12px 60px}
+h1{font-size:22px;margin:6px 0}h2{font-size:16px;margin:0 0 12px}.eyebrow{font-size:11px;letter-spacing:.12em;opacity:.8}.sub{font-size:12px;line-height:1.6;color:#657c8c}.header-sub{font-size:12px;line-height:1.6;color:#e3edf4}
+.panel{background:white;border:1px solid #dce6ee;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 9px #172f4710}
+.controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.controls label{display:flex;flex-direction:column;gap:5px;color:#527085;font-size:12px;font-weight:650}input,select{width:100%;min-height:42px;padding:8px;border:1px solid #c5d4e0;border-radius:8px;background:white;color:#19364d;font:15px system-ui,sans-serif}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.stat{background:#f2f7fb;border-radius:10px;padding:12px}.stat b{display:block;font-size:20px}.stat span{display:block;font-size:11px;color:#637d91;margin-top:3px}
+.notice{background:#fff9e9;border:1px solid #f1dba0;border-radius:9px;padding:10px 12px;font-size:12px;line-height:1.8;margin-top:12px}.danger{color:#bd3544}.rise{color:#08754b}.result-list{display:grid;gap:10px}.result{border:1px solid #d8e4ec;border-radius:12px;background:white;padding:14px}.result-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.race{font-size:17px;font-weight:800}.delta{font-size:22px;font-weight:850;white-space:nowrap;font-variant-numeric:tabular-nums}.player{font-size:14px;font-weight:700;margin-top:4px}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.chip{font-size:11px;background:#edf3f8;color:#506d83;padding:3px 8px;border-radius:30px}.numbers{margin-top:10px;display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:#4a667c}.numbers strong{color:#183047}.empty{padding:28px 16px;text-align:center;color:#6a8090;background:#fff;border-radius:12px;border:1px solid #dce6ee}
+button{font:inherit;background:#1b628b;color:white;border:0;border-radius:8px;padding:9px 14px;cursor:pointer}button:hover{background:#165275}.status{font-size:12px;color:#60788e}.status.error{color:#aa263a}
+@media(max-width:750px){.controls{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:13px}.stats{gap:6px}.stat{padding:9px}.stat b{font-size:17px}header{padding:20px 14px}}
+@media(max-width:380px){.controls{grid-template-columns:repeat(2,minmax(0,1fr))}.result-head{align-items:start}}
+</style>
+</head>
+<body>
+<header>
+  <div class="eyebrow">PERSONAL RESEARCH / 公開閲覧版</div>
+  <h1>展示スリット｜当日の該当候補</h1>
+  <div class="header-sub">当日の全レースを対象に、展示条件が成立した場合の過去1着率の増減を一覧化。予測確率ではありません。</div>
+</header>
+<main>
+  <section class="panel">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+      <h2>候補一覧</h2><button id="reload" type="button">更新データを読み込む</button>
+    </div>
+    <div id="date" class="status">候補データを読み込み中…</div>
+    <div class="stats" style="margin-top:11px">
+      <div class="stat"><b id="nvenues">—</b><span>確認した開催会場</span></div>
+      <div class="stat"><b id="nraces">—</b><span>確認したレース</span></div>
+      <div class="stat"><b id="nresults">—</b><span>表示中の候補</span></div>
+    </div>
+    <div class="notice">重要：<strong>展示前の候補</strong>です。実際の展示タイム・進入は未確認。②は直近1年ST順位差の成立を確認していないため「ST未照合」と表示します。1着率増減は過去の条件付き実績で、当日1着になる確率ではありません。公開ページのため選手名等の表示データは誰でも閲覧できます。</div>
+  </section>
+  <section class="panel">
+    <h2>絞り込み</h2>
+    <div class="controls">
+      <label>1着率の増減幅 (pt以上)<input id="threshold" type="number" min="15" max="100" step="0.5" value="15"></label>
+      <label>増減方向<select id="direction"><option value="both">上昇・下降</option><option value="up">上昇のみ</option><option value="down">下降のみ</option></select></label>
+      <label>展示条件<select id="condition"><option value="1">① 展示0.10秒速い</option><option value="both">①と②（②未照合を含む）</option><option value="2">② ST未照合の仮候補</option></select></label>
+      <label>対象<select id="side"><option value="target">条件を満たす艇</option><option value="front">影響を受ける前艇</option><option value="both">両方</option></select></label>
+      <label>過去該当件数<select id="minn"><option value="10">10件以上（初期設定）</option><option value="30">30件以上</option><option value="1">1件以上（少数注意）</option></select></label>
+      <label>会場<select id="venue"><option value="">全会場</option></select></label>
+      <label>並び順<select id="order"><option value="date">会場・レース順</option><option value="magnitude">増減幅の大きい順</option></select></label>
+      <label>検索<input id="search" type="search" placeholder="選手名・登録番号・レース"></label>
+    </div>
+    <p class="sub">公開データには「±15pt以上」の候補のみ含まれます。15pt未満への検索範囲拡大は、PCからデータを再作成する必要があります。</p>
+  </section>
+  <section>
+    <div id="count" class="status" style="margin-bottom:10px">—</div>
+    <div id="results" class="result-list"><div class="empty">読み込み中…</div></div>
+  </section>
+  <p class="sub" style="margin-top:18px">出走表では艇番を仮コースとして使用。前付け等の実進入変更は反映しません。研究集計期間と当日出走表の日付が異なるため、履歴の最新反映状況も別途確認してください。</p>
+</main>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtPct=n=>Number.isFinite(Number(n))?Number(n).toFixed(2)+'%':'—';
+const fmtPt=n=>(Number(n)>0?'+':'')+Number(n).toFixed(2)+'pt';
+const escapeText=s=>String(s??'').toLocaleLowerCase('ja');
+let snapshot=null;
+function jstDate(){return new Date(Date.now()+9*3600000).toISOString().slice(0,10)}
+function paint(){
+ if(!snapshot)return;
+ let threshold=Number($('threshold').value);
+ if(!Number.isFinite(threshold) || threshold<15){$('threshold').value='15';threshold=15}
+ const direction=$('direction').value,condition=$('condition').value,side=$('side').value,venue=$('venue').value,minimum=Number($('minn').value),search=escapeText($('search').value.trim());
+ let list=snapshot.items.filter(x=>Math.abs(x.delta)+1e-9>=threshold && x.n>=minimum && (direction==='both'||(direction==='up'?x.delta>=threshold:x.delta<=-threshold)) && (condition==='both'||x.condition===condition) && (side==='both'||x.side===side) && (!venue||x.venue===venue) && (!search||escapeText([x.venue+x.race+'R',x.player,x.reg,x.front,x.front_reg].join(' ')).includes(search)));
+ if($('order').value==='magnitude')list.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta)||a.venue.localeCompare(b.venue,'ja')||a.race-b.race);
+ else list.sort((a,b)=>a.venue.localeCompare(b.venue,'ja')||a.race-b.race||a.course-b.course||a.condition.localeCompare(b.condition));
+ $('nresults').textContent=String(list.length);$('count').textContent=list.length+'件表示 ／ 全候補'+snapshot.items.length+'件（出走表の不完全レース'+snapshot.races_incomplete+'件）';
+ $('results').innerHTML=list.length?list.map(x=>`<article class="result"><div class="result-head"><div class="race">${esc(x.venue)} ${x.race}R　${x.course}コース</div><div class="delta ${x.delta>=0?'rise':'danger'}">${esc(fmtPt(x.delta))}</div></div><div class="player">${esc(x.player)} <span class="sub">（${esc(x.reg)}）</span></div><div class="chips"><span class="chip">条件${x.condition==='1'?'① 展示差0.10秒待ち':'② ST未照合・展示待ち'}</span><span class="chip">${x.side==='target'?'対象艇':'前艇への影響'}</span><span class="chip">比較艇 ${esc(x.front)} ${esc(x.front_course)}コース</span></div><div class="numbers"><span>通常1着率 <strong>${esc(fmtPct(x.normal))}</strong></span><span>条件時 <strong>${esc(fmtPct(x.matched))}</strong></span><span>過去N <strong>${esc(x.n)}</strong></span></div></article>`).join(''):'<div class="empty">指定条件に該当する候補はありません。</div>';
+}
+async function reload(){
+ $('date').textContent='候補データを読み込み中…';
+ try{
+  const r=await fetch('./data.json?t='+Date.now(),{cache:'no-store'});
+  if(!r.ok)throw Error('HTTP '+r.status);
+  const x=await r.json();
+  if(x.version!==1||!Array.isArray(x.items)||!/^\d{4}-\d{2}-\d{2}$/.test(x.date))throw Error('候補データの形式が異なります');
+  snapshot=x;
+  const stale=x.date!==jstDate();
+  $('date').textContent='対象日 '+x.date+' ／ 公開データ更新 '+x.generated_at_jst+(stale?' ／ 本日のデータではありません':'');
+  $('date').className='status'+(stale?' error':'');
+  $('nvenues').textContent=String(x.venues);$('nraces').textContent=String(x.races_scanned);
+  const places=[...new Set(x.items.map(v=>v.venue))].sort((a,b)=>a.localeCompare(b,'ja'));
+  $('venue').innerHTML='<option value="">全会場</option>'+places.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('');
+  paint();
+ }catch(e){snapshot=null;$('date').textContent='データが取得できません: '+e.message;$('date').className='status error';$('results').innerHTML='<div class="empty">公開データの準備中、または読み込みエラーです。</div>'}
+}
+for(const id of ['threshold','direction','condition','side','minn','venue','order','search']){
+ $(id).addEventListener('change',paint);
+ if(id==='threshold'||id==='search')$(id).addEventListener('input',paint);
+}
+$('reload').addEventListener('click',reload);reload();
+</script>
+<!-- BRC_SLIT_PUBLIC_PAGES_V1 -->
+</body></html>
