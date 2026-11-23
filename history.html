@@ -125,4 +125,53 @@ get('source').textContent='原本の対象期間：'+meta.first_file+'～'+meta.
   });
 })();
 </script>
+
+<script id="brc-venue-order-v2">
+(function () {
+  "use strict";
+  const order = [
+    "桐生", "戸田", "江戸川", "平和島", "多摩川", "浜名湖",
+    "蒲郡", "常滑", "津", "三国", "びわこ", "住之江",
+    "尼崎", "鳴門", "丸亀", "児島", "宮島", "徳山",
+    "下関", "若松", "芦屋", "福岡", "唐津", "大村"
+  ];
+  const rank = new Map(order.map((name, idx) => [name, idx]));
+  const aliases = { "琵琶湖": "びわこ", "びわ湖": "びわこ" };
+  function weight(option) {
+    const value = String(option.value || "").trim();
+    const label = String(option.textContent || "").replace(/\s+/g, "").trim()
+      .replace(/^[0-9０-９]{1,2}[.．:\-、]?/, "");
+    if (!value || label === "全会場" || label === "すべて") return -1;
+    const key = aliases[label] || label;
+    return rank.has(key) ? rank.get(key) : 999;
+  }
+  function setup() {
+    const select = document.getElementById("venue");
+    if (!select || select.dataset.brcVenueOrderV2 === "1") return;
+    select.dataset.brcVenueOrderV2 = "1";
+    let busy = false;
+    const fix = () => {
+      if (busy) return;
+      const before = Array.from(select.options);
+      if (!before.length) return;
+      const sorted = before.slice().sort((a, b) => weight(a) - weight(b));
+      if (before.every((item, i) => item === sorted[i])) return;
+      busy = true;
+      const selected = select.value;
+      sorted.forEach(opt => select.appendChild(opt));
+      select.value = selected;
+      busy = false;
+    };
+    const observer = new MutationObserver(fix);
+    observer.observe(select, {childList: true});
+    fix();
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setup, {once: true});
+  } else {
+    setup();
+  }
+})();
+</script>
+
 </body></html>
