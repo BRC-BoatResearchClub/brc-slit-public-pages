@@ -1,0 +1,40 @@
+{
+  "schema": "BRC_RACE_ANALYSIS_SNAPSHOT_V1",
+  "version": "V30",
+  "checked_on": "2026-11-24",
+  "auto_updates_enabled": false,
+  "publication_mode": "stored_aggregate_only",
+  "race_results": {
+    "from": "2015-07-25",
+    "through": "2026-11-24",
+    "races": 622291
+  },
+  "racer_data": {
+    "from": "2025-11-25",
+    "through": "2026-11-24",
+    "races": 56023,
+    "players": 1664,
+    "boat_entries": 335549,
+    "venues": 24,
+    "permitted_periods": [
+      "all",
+      "2026",
+      "last_1y"
+    ]
+  },
+  "venue_data": {
+    "through": "2026-11-16",
+    "permitted_periods": [
+      "all",
+      "last_1y",
+      "2026"
+    ]
+  },
+  "nationwide_venue_count_comparison": {
+    "players": 1664,
+    "values_checked": 39936,
+    "mismatches": 0,
+    "verified_on": "2026-11-24"
+  },
+  "notes": "Racer V30 static results through November 24. Legacy venue V23 remains fixed to November 16, and its interface is hidden after successful V30 load. Not an auto-updating feed."
+}
