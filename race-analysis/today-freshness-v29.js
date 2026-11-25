@@ -6,7 +6,7 @@ const today=()=>new Intl.DateTimeFormat('sv-SE',{timeZone:'Asia/Tokyo',year:'num
 const t=()=>new Intl.DateTimeFormat('ja-JP',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date());
 const explicit=new URLSearchParams(location.search).has('date');let manuallySelected=explicit,requestAt=0,lastDate='',lastStatus='';
 const panel=document.createElement('section');panel.id='brc-today-freshness-v29';
-panel.innerHTML='<h2>当日の出走表・更新確認</h2><p id="brc-today-check" role="status" aria-live="polite">出走表の取得状況を確認中…</p><p class="small">出走表は非公式公開APIから取得します。過去の選手成績（V24〜V28）は別データであり、最終集計日は2026年11月16日です。出走表が取得できないときは公式サイトで確認してください。</p>';
+panel.innerHTML='<h2>当日の出走表・更新確認</h2><p id="brc-today-check" role="status" aria-live="polite">出走表の取得状況を確認中…</p><p class="small">出走表は非公式公開APIから取得します。選手別3期間（V30/V34）の集計最終日は2026年11月24日です。旧会場全体の一部分析は11月16日までで、出走表の取得時刻とは異なります。出走表が取得できないときは公式サイトで確認してください。</p>';
 const css=document.createElement('style');css.textContent='#brc-today-freshness-v29{border-top:3px solid #4679a1}#brc-today-check{background:#f1f5fa;border-radius:6px;padding:10px;line-height:1.6}';document.head.append(css);
 const anchor=document.getElementById('brc-periods-v28')||document.getElementById('brc-v28-status')||main.querySelector('footer');if(anchor)main.insertBefore(panel,anchor);else main.append(panel);
 const output=document.getElementById('brc-today-check');
