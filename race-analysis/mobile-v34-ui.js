@@ -38,7 +38,7 @@ const style=document.createElement('style');style.textContent=
 '#brc-v32 .v34-old-toggle{display:none;margin:12px 0 4px;min-height:42px;width:100%;text-align:center;border:1px solid #b4cadc;background:#f3f8fc;color:#17496f;border-radius:7px;font-weight:700;padding:10px;cursor:pointer}'+
 '#brc-v32 .v34-choose-venue{display:inline-flex;min-height:40px;align-items:center;justify-content:center;margin:9px auto 0;padding:6px 14px;border:1px solid #adc3d6;background:#fff;color:#17496f;border-radius:7px;cursor:pointer}';
 document.head.append(style);
-const title=root.querySelector('h2');if(title)title.textContent='V34.3｜6選手の1着率一覧・詳細比較';
+const title=root.querySelector('h2');if(title)title.textContent='V34.4｜6選手の1着率一覧・詳細比較';
 const toggle=document.createElement('div');toggle.className='v34-switch';toggle.setAttribute('role','group');toggle.setAttribute('aria-label','表示形式');
 const cardBtn=document.createElement('button'),tableBtn=document.createElement('button');cardBtn.type=tableBtn.type='button';cardBtn.textContent='6選手一覧';tableBtn.textContent='表';toggle.append(cardBtn,tableBtn);root.insertBefore(toggle,scroller);
 const cards=document.createElement('div');cards.id='brc-v34-card-view';cards.setAttribute('aria-label','6選手の全国・当地着率');scroller.after(cards);
