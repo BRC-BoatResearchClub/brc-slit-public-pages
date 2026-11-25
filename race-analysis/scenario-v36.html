@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BRC スマホ展開分析 V36｜非公開ファイル表示</title>
+<style>
+:root{color-scheme:light}*{box-sizing:border-box}body{background:#f4f7fb;color:#18344a;font-family:system-ui,-apple-system,sans-serif;margin:0;font-size:14px}
+header{background:#153955;color:white;padding:15px 13px}header h1{font-size:19px;margin:0 0 8px}header p{margin:0;color:#d9e7f4;font-size:12px}
+main{max-width:850px;margin:auto;padding:12px}nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}nav a{color:#15527c;background:white;padding:8px 10px;border-radius:6px;text-decoration:none;font-size:12px}
+section{padding:12px;background:white;border-radius:10px;box-shadow:0 1px 4px #29496314;margin:0 0 12px}
+label{font-size:12px;display:block;font-weight:600}input,select{font:inherit;background:white;border:1px solid #bfd1df;border-radius:6px;min-height:40px;padding:7px;width:100%}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}.controls label{display:flex;flex-direction:column;gap:5px}
+#races{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:8px 0}#races button{border:1px solid #c8d8e5;background:#f4f8fb;border-radius:6px;padding:10px 3px;font-size:12px;min-height:42px}
+#races button[aria-pressed=true]{background:#175d91;border-color:#175d91;color:#fff;font-weight:750}
+.note{line-height:1.65;color:#516a7e;font-size:12px}#brc-v32{display:none}
+@media(max-width:400px){main{padding:8px}section{padding:10px}}
+</style></head><body>
+<header><h1>BRC スマホ展開分析 V36</h1><p>PC版の過去実績を、スマホ端末内で安全に比較</p></header>
+<main><nav><a href="./today.html">当日出走表・6選手比較へ戻る</a><a href="./index.html">スマホ分析トップへ</a></nav>
+<section><div class="controls"><label>開催日<input id="date" type="date" value="2026-11-25"></label><label>会場<select id="venue"><option value="1">桐生</option><option value="2">戸田</option><option value="3">江戸川</option><option value="4">平和島</option><option value="5" selected>多摩川</option><option value="6">浜名湖</option><option value="7">蒲郡</option><option value="8">常滑</option><option value="9">津</option><option value="10">三国</option><option value="11">びわこ</option><option value="12">住之江</option><option value="13">尼崎</option><option value="14">鳴門</option><option value="15">丸亀</option><option value="16">児島</option><option value="17">宮島</option><option value="18">徳山</option><option value="19">下関</option><option value="20">若松</option><option value="21">芦屋</option><option value="22">福岡</option><option value="23">唐津</option><option value="24">大村</option></select></label></div>
+<label>レースを選択</label><div id="races" role="group" aria-label="レース選択"></div>
+<p class="note">初期値はV7で確認済みの2026年11月25日・多摩川1Rです。ファイルの開催日・会場・レースが一致したときだけ着率を表示します。</p>
+</section><div id="brc-v32"></div>
+</main>
+<script>(()=>{
+const races=document.getElementById('races');
+for(let n=1;n<=12;n++){const b=document.createElement('button');b.type='button';b.textContent=n+'R';b.setAttribute('aria-pressed',String(n===1));b.addEventListener('click',()=>{for(const item of races.children)item.setAttribute('aria-pressed',String(item===b));});races.append(b);}
+})();</script>
+<script src="./scenario-v36-private-file.js?v=36"></script>
+</body></html>
