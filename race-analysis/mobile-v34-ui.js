@@ -1,4 +1,4 @@
-/* BRC V34.3: mobile six-player compact overview with expandable details from verified V32 history */
+/* BRC V34.4: hide all legacy and snapshot panels until expanded; keep V32 overview and V29 freshness */
 (()=>{'use strict';
 const root=document.getElementById('brc-v32'),rows=document.getElementById('v32-rows'),period=document.getElementById('v32-period'),view=document.getElementById('v32-view');
 if(!root||!rows||!period||!view||document.getElementById('brc-v34-card-view'))return;
@@ -34,7 +34,7 @@ const style=document.createElement('style');style.textContent=
 '#brc-v32 .v34-compact-hdr{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) 63px 63px;gap:6px;padding:0 9px;font-size:11px;font-weight:700;color:#4e677d}'+
 '#brc-v32 .v34-compact-hdr span:not(:first-child){text-align:right}'+
 '#brc-v32 .v34-card .v34-rates{border-top:1px solid #dfe8f1}'+
-'@media(max-width:760px){body:not(.brc-v34-old-open) #brc-periods-v28,body:not(.brc-v34-old-open) #brc-v24-players,body:not(.brc-v34-old-open) #brc-v26,body:not(.brc-v34-old-open) #brc-v23-history{display:none!important}#brc-v32 .v34-old-toggle{display:block!important}}'+
+'@media(max-width:760px){body:not(.brc-v34-old-open) #brc-periods-v28,body:not(.brc-v34-old-open) #brc-v24-players,body:not(.brc-v34-old-open) #brc-v26,body:not(.brc-v34-old-open) #brc-v23-history,body:not(.brc-v34-old-open) #v25,body:not(.brc-v34-old-open) #brc-v28-status{display:none!important}#brc-v32 .v34-old-toggle{display:block!important}}'+
 '#brc-v32 .v34-old-toggle{display:none;margin:12px 0 4px;min-height:42px;width:100%;text-align:center;border:1px solid #b4cadc;background:#f3f8fc;color:#17496f;border-radius:7px;font-weight:700;padding:10px;cursor:pointer}'+
 '#brc-v32 .v34-choose-venue{display:inline-flex;min-height:40px;align-items:center;justify-content:center;margin:9px auto 0;padding:6px 14px;border:1px solid #adc3d6;background:#fff;color:#17496f;border-radius:7px;cursor:pointer}';
 document.head.append(style);
