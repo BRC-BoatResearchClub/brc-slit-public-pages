@@ -79,7 +79,7 @@
         'BRC選手別データの日次自動更新：未設定。';
       ready=true;
     } catch(e) {
-      status.textContent='データ管理情報を確認できません。現在の選手別集計は2026年11月16日で固定です。表示内容を最新情報と誤認しないでください。';
+      status.textContent='データ管理情報を確認できません。選手別集計の最終日を検証できないため、最新情報と誤認しないでください。';
       console.warn('BRC V28 manifest unavailable',e);
     }
   })();
