@@ -240,4 +240,4 @@ if __name__ == "__main__":
         log("REASON", str(exc)[:160])
         sys.exit(2)
     finally:
-        log("=== END ===", "")
+        print("=== END ===", flush=True)
