@@ -1,4 +1,4 @@
-/* BRC V34: mobile card view of V32 PUBLIC history; excludes all private pre-win data */
+/* BRC V34.2: compact display and non-racing notice for V32 PUBLIC history; excludes all private data */
 (()=>{'use strict';
 const root=document.getElementById('brc-v32'),rows=document.getElementById('v32-rows'),period=document.getElementById('v32-period'),view=document.getElementById('v32-view');
 if(!root||!rows||!period||!view||document.getElementById('brc-v34-card-view'))return;
@@ -22,7 +22,10 @@ const style=document.createElement('style');style.textContent=
 '#brc-v32 .v34-note{font-size:12px;color:#536b7e;line-height:1.65;margin:10px 0}'+
 '#brc-v32 .v34-loading{grid-column:1/-1;padding:15px;border:1px dashed #bdccdb;border-radius:7px;color:#536779;text-align:center}'+
 '@media(max-width:760px){#brc-v32 .v34-switch{display:flex}#brc-v32:not(.v34-table-active) .v32-scroll{display:none!important}#brc-v32:not(.v34-table-active) #brc-v34-card-view{display:grid;grid-template-columns:1fr}#brc-v32:not(.v34-table-active) .v32-controls label:nth-child(2){display:none}#brc-v32 .v32-controls{display:flex;flex-wrap:wrap;gap:10px}#brc-v32 .v32-controls select{width:100%;max-width:100%}}'+
-'@media(min-width:520px) and (max-width:760px){#brc-v32:not(.v34-table-active) #brc-v34-card-view{grid-template-columns:repeat(2,minmax(0,1fr))}}';
+'@media(min-width:520px) and (max-width:760px){#brc-v32:not(.v34-table-active) #brc-v34-card-view{grid-template-columns:repeat(2,minmax(0,1fr))}}'+
+'@media(max-width:760px){body:not(.brc-v34-old-open) #brc-periods-v28,body:not(.brc-v34-old-open) #brc-v24-players,body:not(.brc-v34-old-open) #brc-v26,body:not(.brc-v34-old-open) #brc-v23-history{display:none!important}#brc-v32 .v34-old-toggle{display:block!important}}'+
+'#brc-v32 .v34-old-toggle{display:none;margin:12px 0 4px;min-height:42px;width:100%;text-align:center;border:1px solid #b4cadc;background:#f3f8fc;color:#17496f;border-radius:7px;font-weight:700;padding:10px;cursor:pointer}'+
+'#brc-v32 .v34-choose-venue{display:inline-flex;min-height:40px;align-items:center;justify-content:center;margin:9px auto 0;padding:6px 14px;border:1px solid #adc3d6;background:#fff;color:#17496f;border-radius:7px;cursor:pointer}';
 document.head.append(style);
 const title=root.querySelector('h2');if(title)title.textContent='V34｜6選手の全国・当地比較';
 const toggle=document.createElement('div');toggle.className='v34-switch';toggle.setAttribute('role','group');toggle.setAttribute('aria-label','表示形式');
@@ -53,11 +56,33 @@ function update(){
  const name=cells[0].textContent.replace(/^\s*[1-6]\s*/,'').trim();
  data.push({lane,name,n:cells[1].textContent.trim(),nat:cells.slice(2,6).map(e=>e.textContent.trim()),localN:cells[6].textContent.trim(),loc:cells.slice(7,11).map(e=>e.textContent.trim())});
  }
- const signature=JSON.stringify(data);if(signature===digest)return;digest=signature;cards.replaceChildren();
- if(data.length===6)data.forEach(x=>cards.append(makeCard(x)));
- else cards.append(textNode('p','v34-loading','出走表と保存済み過去成績を照合中です。6選手が揃うと表示します。'));
+ const selected=document.getElementById('venue');
+ const venueName=selected?.selectedOptions[0]?.textContent?.trim()||'選択した会場';
+ const detail=document.getElementById('details');
+ const status=detail?.textContent||'';
+ const notFound=/取得できませんでした|出走表がありません|非開催|開催していません/.test(status);
+ const signature=JSON.stringify([data,venueName,notFound]);
+ if(signature===digest)return;digest=signature;cards.replaceChildren();
+ if(data.length===6){data.forEach(x=>cards.append(makeCard(x)));return;}
+ const empty=textNode('div','v34-loading','');
+ empty.append(textNode('p','',notFound?venueName+'：出走表がありません。開催中の会場を選択してください。':'選手の出走表を確認中です。6艇揃うと比較カードを表示します。'));
+ const venueList=document.getElementById('venues');
+ if(venueList){
+  const button=textNode('button','v34-choose-venue','会場一覧から選ぶ');
+  button.type='button';
+  button.addEventListener('click',()=>venueList.scrollIntoView({behavior:'smooth',block:'center'}));
+  empty.append(button);
+ }
+ cards.append(empty);
 }
 new MutationObserver(update).observe(rows,{subtree:true,childList:true,characterData:true});
+const raceDetails=document.getElementById('details');
+if(raceDetails)new MutationObserver(update).observe(raceDetails,{subtree:true,childList:true,characterData:true});
+document.getElementById('venue')?.addEventListener('change',()=>{digest='';update()});
 view.addEventListener('change',()=>{digest='';update()});period.addEventListener('change',()=>{digest='';update()});
+const legacy=document.createElement('button');legacy.type='button';legacy.className='v34-old-toggle';
+legacy.textContent='詳細分析・過去の集計を表示';legacy.setAttribute('aria-expanded','false');
+legacy.addEventListener('click',()=>{const open=document.body.classList.toggle('brc-v34-old-open');legacy.setAttribute('aria-expanded',String(open));legacy.textContent=open?'詳細分析・過去の集計を閉じる':'詳細分析・過去の集計を表示';});
+root.append(legacy);
 setMode('cards');update();
 })();
