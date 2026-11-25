@@ -2,110 +2,242 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="light">
-<meta name="theme-color" content="#14324d">
-<meta name="description" content="展示スリット条件と過去の1着率増減から抽出した当日の候補一覧">
-<title>BRC展示スリット｜当日の候補一覧</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#102e46">
+<meta name="description" content="BRC展示スリット：当日候補を1レース単位・前艇発動艇後艇の3方向で確認する公開版">
+<title>BRC展示スリット｜当日の3方向レース分析</title>
 <style>
-:root{font-family:system-ui,-apple-system,"Yu Gothic",Meiryo,sans-serif;background:#f2f6fa;color:#183047;font-synthesis:none}
-*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(120deg,#12324c,#205e7e);color:white;padding:24px max(18px,env(safe-area-inset-left)) 20px}main{max-width:1050px;margin:auto;padding:16px 12px 60px}
-h1{font-size:22px;margin:6px 0}h2{font-size:16px;margin:0 0 12px}.eyebrow{font-size:11px;letter-spacing:.12em;opacity:.8}.sub{font-size:12px;line-height:1.6;color:#657c8c}.header-sub{font-size:12px;line-height:1.6;color:#e3edf4}
-.panel{background:white;border:1px solid #dce6ee;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 9px #172f4710}
-.controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.controls label{display:flex;flex-direction:column;gap:5px;color:#527085;font-size:12px;font-weight:650}input,select{width:100%;min-height:42px;padding:8px;border:1px solid #c5d4e0;border-radius:8px;background:white;color:#19364d;font:15px system-ui,sans-serif}
-.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.stat{background:#f2f7fb;border-radius:10px;padding:12px}.stat b{display:block;font-size:20px}.stat span{display:block;font-size:11px;color:#637d91;margin-top:3px}
-.notice{background:#fff9e9;border:1px solid #f1dba0;border-radius:9px;padding:10px 12px;font-size:12px;line-height:1.8;margin-top:12px}.danger{color:#bd3544}.rise{color:#08754b}.result-list{display:grid;gap:10px}.result{border:1px solid #d8e4ec;border-radius:12px;background:white;padding:14px}.result-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}.race{font-size:17px;font-weight:800}.delta{font-size:22px;font-weight:850;white-space:nowrap;font-variant-numeric:tabular-nums}.player{font-size:14px;font-weight:700;margin-top:4px}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.chip{font-size:11px;background:#edf3f8;color:#506d83;padding:3px 8px;border-radius:30px}.numbers{margin-top:10px;display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:#4a667c}.numbers strong{color:#183047}.empty{padding:28px 16px;text-align:center;color:#6a8090;background:#fff;border-radius:12px;border:1px solid #dce6ee}
-button{font:inherit;background:#1b628b;color:white;border:0;border-radius:8px;padding:9px 14px;cursor:pointer}button:hover{background:#165275}.status{font-size:12px;color:#60788e}.status.error{color:#aa263a}
-@media(max-width:750px){.controls{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:13px}.stats{gap:6px}.stat{padding:9px}.stat b{font-size:17px}header{padding:20px 14px}}
-@media(max-width:380px){.controls{grid-template-columns:repeat(2,minmax(0,1fr))}.result-head{align-items:start}}
+:root{font:15px/1.5 system-ui,-apple-system,"Yu Gothic",Meiryo,sans-serif;color:#20384b;background:#f1f5f8;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}a{color:#156085}button,input,select{font:inherit}
+header{background:linear-gradient(110deg,#102d43,#205d74);color:white;padding:20px 16px}
+.wrap{max-width:1120px;margin:auto}h1{font-size:clamp(21px,4vw,29px);line-height:1.3;margin:5px 0 8px}
+h2{font-size:16px;margin:0 0 12px}small{font-size:12px}.pretitle{font-size:11px;letter-spacing:.13em;opacity:.8}.headernote{color:#d8e8f0;font-size:12px;line-height:1.65}
+nav{display:flex;flex-wrap:wrap;gap:7px;padding:10px 12px;background:white;border-bottom:1px solid #d4e0e8}
+nav a{font-size:12px;font-weight:750;text-decoration:none;border:1px solid #cedde6;border-radius:8px;padding:9px 11px}
+nav a.active{background:#153d58;color:white;border-color:#153d58}
+main{max-width:1120px;margin:auto;padding:14px 12px 80px}
+.alert{background:#fff7e6;border:1px solid #ead29a;border-left:4px solid #cc9130;border-radius:9px;padding:12px 13px;font-size:12px;line-height:1.7;margin-bottom:12px}
+.panel{background:#fff;border-radius:13px;border:1px solid #dae5ec;padding:14px;margin-bottom:12px}
+.meta{font-size:12px;color:#648094;margin-top:9px}.meta.stale{color:#b42c39;font-weight:800}
+.statgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.stat{background:#f2f7fb;border-radius:9px;padding:10px}
+.stat b{font-size:23px;display:block;font-variant-numeric:tabular-nums;line-height:1.2}
+.stat span{display:block;font-size:11px;color:#617d8c;margin-top:3px}
+.filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.field{display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:750;color:#536e81}
+.field input,.field select{min-height:43px;border-radius:8px;border:1px solid #bdcfdc;padding:8px;background:white;color:#20384b;font-size:14px}
+.venuepill{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.venuepill button{cursor:pointer;border-radius:16px;padding:7px 10px;font-size:12px;color:#285570;border:1px solid #cfe0ea;background:#f5f9fb}
+.venuepill button[aria-pressed=true]{background:#184b69;color:#fff;border-color:#184b69;font-weight:800}
+.sub{color:#667e8e;font-size:11px;line-height:1.7;margin:9px 0 0}
+.tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:15px 2px 9px;font-size:13px}
+.tools strong{font-size:15px}
+.tools button,.reload{border:1px solid #c6d6e1;color:#1d5777;background:white;border-radius:8px;padding:8px 11px;font-size:12px;font-weight:750;cursor:pointer}
+.venuehead{font-size:15px;font-weight:850;color:#1c4860;margin:21px 0 8px;border-bottom:2px solid #c9dce7;padding-bottom:5px}
+.race{border:1px solid #d5e2ea;border-radius:13px;background:#fff;overflow:hidden;margin-bottom:11px}
+.racebar{background:#eaf1f7;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 13px;border-bottom:1px solid #dce7ee}
+.racebar strong{font-size:17px;color:#163e57}.racebar span{font-size:11px;color:#627d8e}
+.pair{padding:11px 12px;border-top:1px solid #e1e9f0}.pair:first-of-type{border-top:0}
+.pairhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.pairhead strong{font-size:13px}.pairhead .weak{font-size:11px;color:#8c5b19;background:#fff1d3;padding:4px 7px;border-radius:6px}
+.pairgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.role{border:1px solid #e0e8ed;border-radius:9px;padding:9px;min-width:0;background:#fff}
+.role.trigger{background:#f2f8fd;border-color:#c8dfeb}
+.roleheader{display:flex;align-items:center;gap:5px;flex-wrap:wrap;color:#537184;font-size:11px}
+.lane{font-size:12px;font-weight:850;text-align:center;min-width:22px;border-radius:5px;padding:2px 5px;border:1px solid #cfd7de;background:#f7f9fb;color:#172f3c}
+.l2{background:#26333c;color:white;border-color:#26333c}.l3{background:#d74040;color:white;border-color:#d74040}.l4{background:#2676c4;color:white;border-color:#2676c4}.l5{background:#e7bf43;color:#262819;border-color:#e7bf43}.l6{background:#3c8759;color:white;border-color:#3c8759}
+.role .athlete{font-size:12px;font-weight:800;line-height:1.35;margin:8px 0 2px;overflow-wrap:anywhere}
+.role .reg{font-size:10px;font-weight:500;color:#748998}
+.change{font-size:clamp(16px,3vw,22px);font-weight:850;margin:7px 0 2px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.change.up{color:#0c7651}.change.down{color:#bd3543}
+.value{font-size:11px;color:#547184;line-height:1.55}
+.value b{color:#19384b}
+.n{display:inline-block;border-radius:6px;padding:2px 6px;font-size:11px;margin-top:6px;font-weight:750}
+.n.low{background:#fce3e5;color:#a02b37}.n.mid{background:#fff0d2;color:#815d19}.n.good{background:#e5f3ea;color:#236441}
+.missing{font-size:11px;color:#688395;line-height:1.65;margin-top:8px}
+.pairnote{color:#6f8795;font-size:10px;margin-top:7px;line-height:1.5}
+.expand{display:block;width:100%;border:0;border-top:1px solid #e2eaf0;background:#fff;color:#1c6285;padding:12px;font-weight:800;font-size:12px;cursor:pointer}
+.empty{background:white;border:1px solid #dce6ed;border-radius:11px;text-align:center;padding:28px 15px;color:#607d91;font-size:13px;line-height:1.8}
+.foot{font-size:12px;color:#5e7b8e;line-height:1.8;padding:12px 3px 30px}
+@media(max-width:720px){.filters{grid-template-columns:repeat(2,minmax(0,1fr))}.statgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:400px){.pair{padding:9px}.pairgrid{gap:5px}.role{padding:7px 6px}.change{font-size:15px;letter-spacing:-.4px}.role .athlete{font-size:11px}.roleheader{font-size:10px}}
 </style>
 </head>
 <body>
-<header>
-  <div class="eyebrow">PERSONAL RESEARCH / 公開閲覧版</div>
-  <h1>展示スリット｜当日の該当候補</h1>
-  <div class="header-sub">当日の全レースを対象に、展示条件が成立した場合の過去1着率の増減を一覧化。予測確率ではありません。</div>
-</header>
-<nav id="brc-pages-analysis-nav-v1" aria-label="分析ページの切り替え" style="background:#fff;border-bottom:1px solid #cad9e4;display:flex;gap:10px;flex-wrap:wrap;padding:12px 16px;position:relative;z-index:2;font-family:system-ui,sans-serif">
-<a href="./index.html" style="padding:9px 13px;border-radius:9px;background:#153d5b;color:#fff;text-decoration:none;font-weight:700">当日の候補一覧</a>
-<a href="./history.html" style="padding:9px 13px;border-radius:9px;background:#edf5ff;color:#12466b;text-decoration:none;font-weight:700">全国・会場・選手別の過去分析</a>
+<header><div class="wrap">
+<div class="pretitle">BRC / PERSONAL RESEARCH · 公開版</div>
+<h1>展示スリット｜レース詳細</h1>
+<div class="headernote">「どのコースが条件発動候補か」を基準に、前艇・発動候補艇・後艇の3方向を1レース内で比較する公開画面です。</div>
+</div></header>
+<nav id="brc-pages-analysis-nav-v1" aria-label="ページ切り替え">
+<a class="active" href="./index.html">当日3方向分析</a>
+<a href="./preview-v2.html">レース別一覧 V2</a>
+<a href="./preview-v3.html">検証版V3</a>
+<a href="./history.html">過去分析</a>
 </nav>
-
 <main>
-  <section class="panel">
-    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
-      <h2>候補一覧</h2><button id="reload" type="button">更新データを読み込む</button>
-    </div>
-    <div id="date" class="status">候補データを読み込み中…</div>
-    <div class="stats" style="margin-top:11px">
-      <div class="stat"><b id="nvenues">—</b><span>確認した開催会場</span></div>
-      <div class="stat"><b id="nraces">—</b><span>確認したレース</span></div>
-      <div class="stat"><b id="nresults">—</b><span>表示中の候補</span></div>
-    </div>
-    <div class="notice">重要：<strong>展示前の候補</strong>です。実際の展示タイム・進入は未確認。②は直近1年ST順位差の成立を確認していないため「ST未照合」と表示します。1着率増減は過去の条件付き実績で、当日1着になる確率ではありません。公開ページのため選手名等の表示データは誰でも閲覧できます。</div>
-  </section>
-  <section class="panel">
-    <h2>絞り込み</h2>
-    <div class="controls">
-      <label>1着率の増減幅 (pt以上)<input id="threshold" type="number" min="15" max="100" step="0.5" value="15"></label>
-      <label>増減方向<select id="direction"><option value="both">上昇・下降</option><option value="up">上昇のみ</option><option value="down">下降のみ</option></select></label>
-      <label>展示条件<select id="condition"><option value="1">① 展示0.10秒速い</option><option value="both">①と②（②未照合を含む）</option><option value="2">② ST未照合の仮候補</option></select></label>
-      <label>対象<select id="side"><option value="target">条件を満たす艇</option><option value="front">影響を受ける前艇</option><option value="both">両方</option></select></label>
-      <label>過去該当件数<select id="minn"><option value="10">10件以上（初期設定）</option><option value="30">30件以上</option><option value="1">1件以上（少数注意）</option></select></label>
-      <label>会場<select id="venue"><option value="">全会場</option></select></label>
-      <label>並び順<select id="order"><option value="date">会場・レース順</option><option value="magnitude">増減幅の大きい順</option></select></label>
-      <label>検索<input id="search" type="search" placeholder="選手名・登録番号・レース"></label>
-    </div>
-    <p class="sub">公開データには「±15pt以上」の候補のみ含まれます。15pt未満への検索範囲拡大は、PCからデータを再作成する必要があります。</p>
-  </section>
-  <section>
-    <div id="count" class="status" style="margin-bottom:10px">—</div>
-    <div id="results" class="result-list"><div class="empty">読み込み中…</div></div>
-  </section>
-  <p class="sub" style="margin-top:18px">出走表では艇番を仮コースとして使用。前付け等の実進入変更は反映しません。研究集計期間と当日出走表の日付が異なるため、履歴の最新反映状況も別途確認してください。</p>
+<div class="alert"><b>条件発動は未確認です。</b> 当日の展示タイム・ST順位・実進入コースは照合していません。数値は「過去にその条件だった場合」の集計です。特に条件②はST未照合の仮候補です。後艇は当日データと日付が一致する検証済みデータがある場合だけ表示します。</div>
+<section class="panel">
+ <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0">当日の候補データ</h2><button class="reload" id="reload" type="button">データを再読込</button></div>
+ <div id="date" class="meta">読み込み中…</div>
+ <div class="statgrid" style="margin-top:11px">
+  <div class="stat"><b id="venues">—</b><span>開催会場</span></div>
+  <div class="stat"><b id="races">—</b><span>確認レース数</span></div>
+  <div class="stat"><b id="visibleRaces">—</b><span>候補レース</span></div>
+  <div class="stat"><b id="visiblePairs">—</b><span>条件発動の組み合わせ</span></div>
+ </div>
+ <div id="rearState" class="sub">後艇データ：日次照合は未連携</div>
+</section>
+<section class="panel">
+ <h2>レースの絞り込み</h2>
+ <div class="filters">
+  <label class="field">展示条件<select id="condition"><option value="1">条件①・展示差待ち</option><option value="all">条件①＋②（②は未照合）</option><option value="2">条件②・ST未照合</option></select></label>
+  <label class="field">過去の該当件数<select id="minN"><option value="10">N10以上</option><option value="30">N30以上</option><option value="1">N1以上（極少標本あり）</option></select></label>
+  <label class="field">増減ptの幅<select id="threshold"><option value="15">±15pt以上</option><option value="20">±20pt以上</option><option value="30">±30pt以上</option><option value="40">±40pt以上</option></select></label>
+  <label class="field">着率の変化<select id="direction"><option value="all">上昇・下降</option><option value="up">上昇のみ</option><option value="down">下降のみ</option></select></label>
+  <label class="field">対象役割<select id="side"><option value="all">3方向すべて</option><option value="target">発動候補艇</option><option value="front">前艇</option><option value="rear">後艇（連携時のみ）</option></select></label>
+  <label class="field">並び順<select id="sort"><option value="venue">桐生→大村 / レース順</option><option value="magnitude">増減ptの大きなレース順</option></select></label>
+ </div>
+ <label class="field" style="margin-top:10px">検索<input id="search" type="search" placeholder="会場・レース・選手名・登録番号"></label>
+ <div class="sub">開催会場だけ表示（並びは24場の固定コード順）</div>
+ <div class="venuepill" id="venuePills"></div>
+ <p class="sub">元の候補データは±15pt以上だけを収録しています。条件を絞ると、同じレースの一部の役割が非表示になることがあります。未掲載＝影響ゼロではありません。</p>
+</section>
+<div class="tools"><strong>候補レースの詳細</strong><span id="count">読み込み中…</span></div>
+<div id="results"><div class="empty">当日データの読み込み中…</div></div>
+<div class="foot"><b>用語：</b>前艇＝発動候補艇の1つ内側の仮コース、後艇＝1つ外側の仮コースです。6コースが発動候補なら後艇はありません。元研究では公式Kの実進入コースで集計していますが、当日候補は艇番を仮コースとして表示します。前付け等があれば対応関係は変わります。<br><b>計算：</b>通常1着率・条件該当時1着率・増減ptは既存の公開データをそのまま利用しています。新しい確率計算や予測補正は行っていません。<br><b>公開版：</b>当日の過去実績候補を示します。過去分析は別ページに保存しています。</div>
 </main>
 <script>
 'use strict';
+const VENUES='桐生,戸田,江戸川,平和島,多摩川,浜名湖,蒲郡,常滑,津,三国,びわこ,住之江,尼崎,鳴門,丸亀,児島,宮島,徳山,下関,若松,芦屋,福岡,唐津,大村'.split(',');
+const ORDER=new Map(VENUES.map((v,i)=>[v,i]));
 const $=id=>document.getElementById(id);
-const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const fmtPct=n=>Number.isFinite(Number(n))?Number(n).toFixed(2)+'%':'—';
-const fmtPt=n=>(Number(n)>0?'+':'')+Number(n).toFixed(2)+'pt';
-const escapeText=s=>String(s??'').toLocaleLowerCase('ja');
-let snapshot=null;
-function jstDate(){return new Date(Date.now()+9*3600000).toISOString().slice(0,10)}
-function paint(){
+const esc=x=>String(x==null?'':x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cmpVenue=(a,b)=>(ORDER.get(a)??999)-(ORDER.get(b)??999)||a.localeCompare(b,'ja');
+const signed=n=>(Number(n)>0?'+':'')+Number(n).toFixed(2)+'pt';
+const pct=n=>Number.isFinite(Number(n))?Number(n).toFixed(2)+'%':'—';
+const jstDate=()=>new Date(Date.now()+9*3600000).toISOString().slice(0,10);
+let snapshot=null,rearData=[],rearReady=false,activeVenue='',expand=new Set();
+function trigger(r){return Number(r.side==='front'?r.front_course:r.course);}
+function keyOf(v,r,t,c){return [v,r,t,c].join('|');}
+function validRear(r){return r&&typeof r.venue==='string'&&Number.isInteger(Number(r.race))&&Number.isInteger(Number(r.trigger_course))&&Number.isInteger(Number(r.course))&&(r.condition==='1'||r.condition==='2')&&typeof r.player==='string'&&Number.isFinite(Number(r.delta))&&Number.isFinite(Number(r.n));}
+function asRoleRow(r){return {venue:r.venue,race:Number(r.race),condition:String(r.condition),player:r.player,reg:r.reg,course:Number(r.course),side:'rear',normal:r.normal,matched:r.matched,delta:Number(r.delta),n:Number(r.n),trigger_course:Number(r.trigger_course)};}
+function passes(r){
+ const cond=$('condition').value,side=$('side').value,dir=$('direction').value,min=Number($('minN').value),threshold=Number($('threshold').value),q=$('search').value.trim().toLowerCase();
+ const text=[r.venue+' '+r.race+'R',r.venue+r.race+'R',r.race+'R',r.player,r.reg,r.front,r.front_reg].join(' ').toLowerCase();
+ return r.n>=min&&Math.abs(r.delta)>=threshold-1e-9&&(cond==='all'||r.condition===cond)&&
+ (side==='all'||r.side===side)&&(!activeVenue||r.venue===activeVenue)&&
+ (dir==='all'||(dir==='up'?r.delta>=threshold:r.delta<=-threshold))&&
+ (!q||text.includes(q));
+}
+function memberHTML(r,label,lane,triggerFlag){
+ const head='<div class="role '+(triggerFlag?'trigger':'')+'"><div class="roleheader"><span class="lane l'+lane+'">'+lane+'</span>'+label+'</div>';
+ if(!r){
+  const message=label==='後艇'&&!rearReady?'後艇の当日選手・条件別着率は未連携':'公開候補に未掲載（±15pt未満・絞り込み等）';
+  return head+'<div class="missing">'+message+'</div></div>';
+ }
+ const n=Number(r.n),cls=n<10?'low':n<30?'mid':'good',msg=n<10?'極少数':n<30?'少数注意':'N30以上';
+ return head+'<div class="athlete">'+esc(r.player)+' <span class="reg">'+esc(r.reg)+'</span></div>'+
+ '<div class="change '+(r.delta>=0?'up':'down')+'">'+signed(r.delta)+'</div>'+
+ '<div class="value">通常 <b>'+pct(r.normal)+'</b><br>該当 <b>'+pct(r.matched)+'</b></div>'+
+ '<span class="n '+cls+'">N='+n+' / '+msg+'</span></div>';
+}
+function makePair(p){
+ const t=p.trigger,front=t-1,rear=t+1;
+ const bySide={};
+ for(const r of p.items)bySide[r.side]=r;
+ const cond=p.condition==='1'?'条件①：展示差0.10秒以上待ち':'条件②：ST未照合・展示差待ち';
+ return '<section class="pair"><div class="pairhead"><strong>'+t+'コースが発動候補</strong><span class="weak">'+cond+'</span></div>'+
+ '<div class="pairgrid">'+
+ memberHTML(bySide.front,'前艇',front,false)+
+ memberHTML(bySide.target,'発動候補',t,true)+
+ (rear<=6?memberHTML(bySide.rear,'後艇',rear,false):'<div class="role"><div class="roleheader">後艇</div><div class="missing">6コース発動候補のため存在しません</div></div>')+
+ '</div><div class="pairnote">同じ条件・同じレースの比較です。数値の未掲載は影響ゼロを意味しません。</div></section>';
+}
+function render(){
  if(!snapshot)return;
- let threshold=Number($('threshold').value);
- if(!Number.isFinite(threshold) || threshold<15){$('threshold').value='15';threshold=15}
- const direction=$('direction').value,condition=$('condition').value,side=$('side').value,venue=$('venue').value,minimum=Number($('minn').value),search=escapeText($('search').value.trim());
- let list=snapshot.items.filter(x=>Math.abs(x.delta)+1e-9>=threshold && x.n>=minimum && (direction==='both'||(direction==='up'?x.delta>=threshold:x.delta<=-threshold)) && (condition==='both'||x.condition===condition) && (side==='both'||x.side===side) && (!venue||x.venue===venue) && (!search||escapeText([x.venue+x.race+'R',x.player,x.reg,x.front,x.front_reg].join(' ')).includes(search)));
- if($('order').value==='magnitude')list.sort((a,b)=>Math.abs(b.delta)-Math.abs(a.delta)||a.venue.localeCompare(b.venue,'ja')||a.race-b.race);
- else list.sort((a,b)=>a.venue.localeCompare(b.venue,'ja')||a.race-b.race||a.course-b.course||a.condition.localeCompare(b.condition));
- $('nresults').textContent=String(list.length);$('count').textContent=list.length+'件表示 ／ 全候補'+snapshot.items.length+'件（出走表の不完全レース'+snapshot.races_incomplete+'件）';
- $('results').innerHTML=list.length?list.map(x=>`<article class="result"><div class="result-head"><div class="race">${esc(x.venue)} ${x.race}R　${x.course}コース</div><div class="delta ${x.delta>=0?'rise':'danger'}">${esc(fmtPt(x.delta))}</div></div><div class="player">${esc(x.player)} <span class="sub">（${esc(x.reg)}）</span></div><div class="chips"><span class="chip">条件${x.condition==='1'?'① 展示差0.10秒待ち':'② ST未照合・展示待ち'}</span><span class="chip">${x.side==='target'?'対象艇':'前艇への影響'}</span><span class="chip">比較艇 ${esc(x.front)} ${esc(x.front_course)}コース</span></div><div class="numbers"><span>通常1着率 <strong>${esc(fmtPct(x.normal))}</strong></span><span>条件時 <strong>${esc(fmtPct(x.matched))}</strong></span><span>過去N <strong>${esc(x.n)}</strong></span></div></article>`).join(''):'<div class="empty">指定条件に該当する候補はありません。</div>';
+ const rows=snapshot.items.concat(rearReady?rearData:[]).filter(passes);
+ const races=new Map();
+ for(const r of rows){
+  const t=r.side==='rear'?Number(r.trigger_course):trigger(r);
+  if(!Number.isInteger(t)||t<2||t>6)continue;
+  const racekey=r.venue+'|'+r.race, pairkey=keyOf(r.venue,r.race,t,r.condition);
+  if(!races.has(racekey))races.set(racekey,{key:racekey,venue:r.venue,race:Number(r.race),pairs:new Map()});
+  const race=races.get(racekey);
+  if(!race.pairs.has(pairkey))race.pairs.set(pairkey,{key:pairkey,trigger:t,condition:r.condition,items:[]});
+  race.pairs.get(pairkey).items.push(r);
+ }
+ const list=[...races.values()];
+ for(const r of list)r.pairs=[...r.pairs.values()].sort((a,b)=>a.trigger-b.trigger||a.condition.localeCompare(b.condition));
+ const impact=x=>Math.max(...x.pairs.flatMap(p=>p.items.map(r=>Math.abs(r.delta))));
+ list.sort($('sort').value==='magnitude'?
+ (a,b)=>impact(b)-impact(a)||cmpVenue(a.venue,b.venue)||a.race-b.race:
+ (a,b)=>cmpVenue(a.venue,b.venue)||a.race-b.race);
+ const nPairs=list.reduce((a,r)=>a+r.pairs.length,0);
+ $('visibleRaces').textContent=list.length;
+ $('visiblePairs').textContent=nPairs;
+ $('count').textContent=list.length+'レース / '+nPairs+'組み合わせ / '+rows.length+'記録';
+ if(!list.length){$('results').innerHTML='<div class="empty">該当する候補がありません。<br>条件・N・会場・対象役割を変更してください。</div>';return;}
+ let prev='';
+ const out=[];
+ for(const g of list){
+  if($('sort').value==='venue'&&prev!==g.venue){out.push('<div class="venuehead">'+esc(g.venue)+'</div>');prev=g.venue;}
+  const showAll=expand.has(g.key),shown=showAll?g.pairs:g.pairs.slice(0,2);
+  out.push('<article class="race"><div class="racebar"><strong>'+esc(g.venue)+' '+g.race+'R</strong><span>'+g.pairs.length+'組み合わせ</span></div>');
+  for(const p of shown)out.push(makePair(p));
+  if(g.pairs.length>2)out.push('<button type="button" class="expand" data-expand="'+esc(g.key)+'">'+(showAll?'折りたたむ':'他の'+(g.pairs.length-2)+'組み合わせを見る')+'</button>');
+  out.push('</article>');
+ }
+ $('results').innerHTML=out.join('');
 }
-async function reload(){
- $('date').textContent='候補データを読み込み中…';
+function pills(){
+ const places=[...new Set(snapshot.items.map(r=>r.venue))].sort(cmpVenue);
+ $('venuePills').innerHTML='<button data-venue="" aria-pressed="'+(!activeVenue)+'">全会場</button>'+
+ places.map(v=>'<button data-venue="'+esc(v)+'" aria-pressed="'+(activeVenue===v)+'">'+esc(v)+'</button>').join('');
+}
+for(const id of ['condition','minN','threshold','direction','side','sort','search']){
+ $(id).addEventListener(id==='search'?'input':'change',render);
+}
+$('venuePills').addEventListener('click',e=>{
+ const b=e.target.closest('button[data-venue]');if(!b)return;
+ activeVenue=b.dataset.venue;pills();render();
+});
+$('results').addEventListener('click',e=>{
+ const b=e.target.closest('button[data-expand]');if(!b)return;
+ const k=b.dataset.expand;if(expand.has(k))expand.delete(k);else expand.add(k);render();
+});
+async function load(){
+ $('date').textContent='読み込み中…';
  try{
-  const r=await fetch('./data.json?t='+Date.now(),{cache:'no-store'});
-  if(!r.ok)throw Error('HTTP '+r.status);
-  const x=await r.json();
-  if(x.version!==1||!Array.isArray(x.items)||!/^\d{4}-\d{2}-\d{2}$/.test(x.date))throw Error('候補データの形式が異なります');
-  snapshot=x;
+  const res=await fetch('./data.json?t='+Date.now(),{cache:'no-store'});
+  if(!res.ok)throw new Error('当日データ HTTP '+res.status);
+  const x=await res.json();
+  if(x.version!==1||!Array.isArray(x.items)||!/^\d{4}-\d{2}-\d{2}$/.test(x.date))throw new Error('当日データの形式が一致しません');
+  if(x.items.some(r=>!Number.isFinite(Number(r.delta))||!Number.isFinite(Number(r.n))))throw new Error('数値不正');
+  snapshot=x;rearData=[];rearReady=false;activeVenue='';expand.clear();
+  try{
+   const rr=await fetch('./rear-data.json?t='+Date.now(),{cache:'no-store'});
+   if(rr.ok){
+    const d=await rr.json();
+    if(d.version===1&&d.date===x.date&&Array.isArray(d.items)&&d.items.every(validRear)){
+     rearData=d.items.map(asRoleRow);rearReady=true;
+    }
+   }
+  }catch(_e){/* optional rear data: leave unlinked */}
   const stale=x.date!==jstDate();
-  $('date').textContent='対象日 '+x.date+' ／ 公開データ更新 '+x.generated_at_jst+(stale?' ／ 本日のデータではありません':'');
-  $('date').className='status'+(stale?' error':'');
-  $('nvenues').textContent=String(x.venues);$('nraces').textContent=String(x.races_scanned);
-  const places=[...new Set(x.items.map(v=>v.venue))].sort((a,b)=>a.localeCompare(b,'ja'));
-  $('venue').innerHTML='<option value="">全会場</option>'+places.map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('');
-  paint();
- }catch(e){snapshot=null;$('date').textContent='データが取得できません: '+e.message;$('date').className='status error';$('results').innerHTML='<div class="empty">公開データの準備中、または読み込みエラーです。</div>'}
+  $('date').textContent='対象日 '+x.date+' ／ データ作成 '+x.generated_at_jst+(stale?' ／ 本日のデータではありません':'');
+  $('date').className='meta'+(stale?' stale':'');
+  $('venues').textContent=x.venues;
+  $('races').textContent=x.races_scanned;
+  $('rearState').textContent=rearReady?'後艇の個人データ：日次照合済み（'+rearData.length+'件）':'後艇の個人データ：日次照合は未連携（数値は表示しません）';
+  pills();render();
+ }catch(e){
+  snapshot=null;$('date').textContent='エラー：'+e.message;$('date').className='meta stale';
+  $('results').innerHTML='<div class="empty">候補データを読み込めませんでした。ネットワークと公開状態をご確認ください。</div>';
+ }
 }
-for(const id of ['threshold','direction','condition','side','minn','venue','order','search']){
- $(id).addEventListener('change',paint);
- if(id==='threshold'||id==='search')$(id).addEventListener('input',paint);
-}
-$('reload').addEventListener('click',reload);reload();
+$('reload').addEventListener('click',load);
+load();
 </script>
-<!-- BRC_SLIT_PUBLIC_PAGES_V1 -->
-</body></html>
+</body>
+</html>
