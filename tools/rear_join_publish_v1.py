@@ -306,4 +306,4 @@ if __name__=="__main__":
     finally:
         log("BRC_APPLICATION_CHANGED","NO")
         log("INDEX_HISTORY_CHANGED","NO")
-        log("=== END ===")
+        print("=== END ===", flush=True)
