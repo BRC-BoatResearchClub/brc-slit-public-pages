@@ -1,4 +1,4 @@
-/* BRC V34.4: hide all legacy and snapshot panels until expanded; keep V32 overview and V29 freshness */
+/* BRC V34.5: compact overview includes sample counts and low-N warnings; all counts sourced from V32 public history */
 (()=>{'use strict';
 const root=document.getElementById('brc-v32'),rows=document.getElementById('v32-rows'),period=document.getElementById('v32-period'),view=document.getElementById('v32-view');
 if(!root||!rows||!period||!view||document.getElementById('brc-v34-card-view'))return;
@@ -29,7 +29,9 @@ const style=document.createElement('style');style.textContent=
 '#brc-v32 .v34-card summary:focus-visible{outline:2px solid #1969a5}'+
 '#brc-v32 .v34-card .v34-card-head{font-size:13px}'+
 '#brc-v32 .v34-player-name{min-width:0;overflow:hidden;text-overflow:ellipsis}'+
-'#brc-v32 .v34-rate{font-size:15px;font-weight:750;color:#173b5d;text-align:right}'+
+'#brc-v32 .v34-rate{font-size:15px;font-weight:750;color:#173b5d;text-align:right;line-height:1.35}'+
+'#brc-v32 .v34-rate .v34-sample{display:block;font-size:10px;font-weight:500;color:#60788c;line-height:1.4;white-space:nowrap}'+
+'#brc-v32 .v34-rate.v34-small-sample .v34-sample{color:#a35319;font-weight:700}'+
 '#brc-v32 .v34-counts{padding:4px 10px 0}'+
 '#brc-v32 .v34-compact-hdr{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) 63px 63px;gap:6px;padding:0 9px;font-size:11px;font-weight:700;color:#4e677d}'+
 '#brc-v32 .v34-compact-hdr span:not(:first-child){text-align:right}'+
@@ -38,11 +40,11 @@ const style=document.createElement('style');style.textContent=
 '#brc-v32 .v34-old-toggle{display:none;margin:12px 0 4px;min-height:42px;width:100%;text-align:center;border:1px solid #b4cadc;background:#f3f8fc;color:#17496f;border-radius:7px;font-weight:700;padding:10px;cursor:pointer}'+
 '#brc-v32 .v34-choose-venue{display:inline-flex;min-height:40px;align-items:center;justify-content:center;margin:9px auto 0;padding:6px 14px;border:1px solid #adc3d6;background:#fff;color:#17496f;border-radius:7px;cursor:pointer}';
 document.head.append(style);
-const title=root.querySelector('h2');if(title)title.textContent='V34.4｜6選手の1着率一覧・詳細比較';
+const title=root.querySelector('h2');if(title)title.textContent='V34.5｜6選手の1着率・出走数一覧';
 const toggle=document.createElement('div');toggle.className='v34-switch';toggle.setAttribute('role','group');toggle.setAttribute('aria-label','表示形式');
 const cardBtn=document.createElement('button'),tableBtn=document.createElement('button');cardBtn.type=tableBtn.type='button';cardBtn.textContent='6選手一覧';tableBtn.textContent='表';toggle.append(cardBtn,tableBtn);root.insertBefore(toggle,scroller);
 const cards=document.createElement('div');cards.id='brc-v34-card-view';cards.setAttribute('aria-label','6選手の全国・当地着率');scroller.after(cards);
-const explain=document.createElement('p');explain.className='v34-note';explain.textContent='選手名の行をタップすると2・3着率と3連対率を開けます。2026年11月24日までの確定済み過去成績です。事前1着率・予測値は非公開データのため、この公開ページには含めません。全国・当地とも、枠番と同じ番号の過去の実進入コース成績です。';cards.after(explain);
+const explain=document.createElement('p');explain.className='v34-note';explain.textContent='Nは出走数、※は20走未満の参考値です。選手名の行をタップすると2・3着率と3連対率を開けます。2026年11月24日までの確定済み過去成績です。事前1着率・予測値は非公開データのため、この公開ページには含めません。全国・当地とも、枠番と同じ番号の過去の実進入コース成績です。';cards.after(explain);
 let mode='cards',digest='';const metrics=['1着率','2着率','3着率','3連対率'];
 function textNode(tag,cls,value){const el=document.createElement(tag);if(cls)el.className=cls;el.textContent=value;return el;}
 function setMode(next){mode=next;root.classList.toggle('v34-table-active',mode==='table');cardBtn.setAttribute('aria-pressed',String(mode==='cards'));tableBtn.setAttribute('aria-pressed',String(mode==='table'));if(mode==='cards'&&view.value!=='all'){view.value='all';view.dispatchEvent(new Event('change',{bubbles:true}));}update();}
@@ -51,7 +53,8 @@ function makeCard(x){
  const article=document.createElement('details');article.className='v34-card';const head=textNode('summary','v34-card-head',''),lane=textNode('span','v34-lane',x.lane);
  const colors=['#ffffff','#161c26','#d40028','#0473c2','#ffe000','#008d4a'],n=Number(x.lane);
  if(n>=1&&n<=6){lane.style.background=colors[n-1];lane.style.color=[2,3,4,6].includes(n)?'#fff':'#172433';}
- head.append(lane,textNode('span','v34-player-name',x.name),textNode('span','v34-rate',x.nat[0]),textNode('span','v34-rate',x.loc[0]));article.append(head);
+ const rateCell=(value,n)=>{const col=textNode('span','v34-rate',value);const m=String(n).replace(/,/g,'').match(/[0-9]+/);const count=m?Number(m[0]):null;col.append(textNode('small','v34-sample','N='+String(n).replace(/\s*※/g,'')+(count!==null&&count<20?' ※':'')));if(count!==null&&count<20){col.classList.add('v34-small-sample');col.title='出走20未満の参考値';}return col;};
+ head.append(lane,textNode('span','v34-player-name',x.name),rateCell(x.nat[0],x.n),rateCell(x.loc[0],x.localN));article.append(head);
  const counts=textNode('div','v34-counts','');counts.append(textNode('span','','全国 '+x.n+'走'),textNode('span','','当地 '+x.localN+'走'));article.append(counts);
  const table=document.createElement('table');table.className='v34-rates';const thead=document.createElement('thead'),h=document.createElement('tr');
  ['','全国','当地'].forEach(v=>h.append(textNode('th','',v)));thead.append(h);table.append(thead);
