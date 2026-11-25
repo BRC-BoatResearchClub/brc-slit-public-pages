@@ -22,7 +22,7 @@ const style=document.createElement('style');style.textContent=
 '#brc-v32 .v34-note{font-size:12px;color:#536b7e;line-height:1.65;margin:10px 0}'+
 '#brc-v32 .v34-loading{grid-column:1/-1;padding:15px;border:1px dashed #bdccdb;border-radius:7px;color:#536779;text-align:center}'+
 '@media(max-width:760px){#brc-v32 .v34-switch{display:flex}#brc-v32:not(.v34-table-active) .v32-scroll{display:none!important}#brc-v32:not(.v34-table-active) #brc-v34-card-view{display:grid;grid-template-columns:1fr}#brc-v32:not(.v34-table-active) .v32-controls label:nth-child(2){display:none}#brc-v32 .v32-controls{display:flex;flex-wrap:wrap;gap:10px}#brc-v32 .v32-controls select{width:100%;max-width:100%}}'+
-'@media(min-width:520px) and (max-width:760px){#brc-v32:not(.v34-table-active) #brc-v34-card-view{grid-template-columns:repeat(2,minmax(0,1fr))}}'+
+'@media(min-width:520px) and (max-width:760px){#brc-v32:not(.v34-table-active) #brc-v34-card-view{grid-template-columns:minmax(0,1fr)}}'+
 '#brc-v32 .v34-card{padding:0;overflow:hidden}'+
 '#brc-v32 .v34-card summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:26px minmax(0,1fr) 63px 63px;align-items:center;gap:6px;padding:13px 9px}'+
 '#brc-v32 .v34-card summary::-webkit-details-marker{display:none}'+
@@ -31,7 +31,7 @@ const style=document.createElement('style');style.textContent=
 '#brc-v32 .v34-player-name{min-width:0;overflow:hidden;text-overflow:ellipsis}'+
 '#brc-v32 .v34-rate{font-size:15px;font-weight:750;color:#173b5d;text-align:right}'+
 '#brc-v32 .v34-counts{padding:4px 10px 0}'+
-'#brc-v32 .v34-compact-hdr{display:grid;grid-template-columns:minmax(0,1fr) 63px 63px;gap:6px;padding:0 9px;font-size:11px;font-weight:700;color:#4e677d}'+
+'#brc-v32 .v34-compact-hdr{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) 63px 63px;gap:6px;padding:0 9px;font-size:11px;font-weight:700;color:#4e677d}'+
 '#brc-v32 .v34-compact-hdr span:not(:first-child){text-align:right}'+
 '#brc-v32 .v34-card .v34-rates{border-top:1px solid #dfe8f1}'+
 '@media(max-width:760px){body:not(.brc-v34-old-open) #brc-periods-v28,body:not(.brc-v34-old-open) #brc-v24-players,body:not(.brc-v34-old-open) #brc-v26,body:not(.brc-v34-old-open) #brc-v23-history{display:none!important}#brc-v32 .v34-old-toggle{display:block!important}}'+
